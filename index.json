@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "name": "漫画站",
+    "version": "1.0.0",
+    "url": "https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/sources/manhuazhan/venera.js",
+    "description": "manhuazhan；关键词搜索可能需要网页验证，支持漫画数字 ID。"
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "name": "dual-reader-sources",
+  "private": true,
+  "scripts": {"test": "node --test tests/*.test.cjs", "smoke": "node scripts/smoke.cjs"},
+  "devDependencies": {"cheerio": "1.2.0"}
+}
