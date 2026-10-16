@@ -1,4 +1,7 @@
-use crate::parser::{self, BASE_URL};
+use crate::{
+    chapters::{chapter_number, ensure_newest_first, order_hint},
+    parser::{self, BASE_URL},
+};
 use aidoku::{
     AidokuError, Chapter, ContentRating, DeepLinkHandler, DeepLinkResult, FilterValue,
     ImageRequestProvider, Listing, ListingProvider, Manga, MangaPageResult, Page, PageContent,
@@ -212,22 +215,16 @@ impl Source for Manhuazhan {
                 let Some(key) = anchor.attr("href").and_then(|url| parser::chapter_key(&url, &manga.key)) else { continue; };
                 if chapters.iter().any(|chapter| chapter.key == key) { continue; }
                 let title = anchor.select_first(".name").and_then(|element| element.text()).or_else(|| anchor.text());
-                let chapter_number = title.as_ref().and_then(|title| title.strip_prefix('第')).and_then(|rest| rest.split('话').next()).and_then(|number| number.trim().parse().ok());
+                let chapter_number = title.as_deref().and_then(chapter_number);
                 let date_uploaded = anchor.select_first("time").and_then(|element| element.text()).and_then(|date| aidoku::imports::std::parse_date(date, "yyyy-MM-dd")).map(|timestamp| timestamp as i64);
                 chapters.push(Chapter {url: Some(format!("{BASE_URL}/chapter/{key}.html")), key, title, chapter_number, date_uploaded, language: Some("zh".into()), ..Default::default()});
             }
             if chapters.is_empty() {
                 bail!("章节目录为空，站点格式可能已变化。");
             }
-            if chapters.len() > 1
-                && chapters
-                    .first()
-                    .and_then(|chapter| chapter.chapter_number)
-                    .zip(chapters.last().and_then(|chapter| chapter.chapter_number))
-                    .is_some_and(|(first, last)| first < last)
-            {
-                chapters.reverse();
-            }
+            ensure_newest_first(&mut chapters, |chapter| {
+                order_hint(chapter.chapter_number, &chapter.key)
+            });
             manga.chapters = Some(chapters);
         }
         Ok(manga)

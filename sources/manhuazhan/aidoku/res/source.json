@@ -2,7 +2,7 @@
   "info": {
     "id": "zh.manhuazhan",
     "name": "漫画站",
-    "version": 1,
+    "version": 2,
     "url": "https://m.manhuazhan.com",
     "urls": ["https://m.manhuazhan.com", "https://www.manhuazhan.com", "https://manhuazhan.com"],
     "languages": ["zh"],

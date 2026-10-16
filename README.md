@@ -20,7 +20,7 @@ https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/index.json
 https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/aidoku/index.json
 ```
 
-也可从 [Releases](https://github.com/940440952/venera-sources/releases) 下载 `zh.manhuazhan-v1.aix`，通过系统分享菜单用 Aidoku 打开，或在 Aidoku 添加源界面选择本地 `.aix` 文件。Rust 源码不能直接导入 Aidoku，须使用构建后的 `.aix` 包。此实现使用新版 Aidoku API，不适用于旧版 legacy 源运行时。
+也可从 [Releases](https://github.com/940440952/venera-sources/releases) 下载 `zh.manhuazhan-v2.aix`，通过系统分享菜单用 Aidoku 打开，或在 Aidoku 添加源界面选择本地 `.aix` 文件。Rust 源码不能直接导入 Aidoku，须使用构建后的 `.aix` 包。此实现使用新版 Aidoku API，不适用于旧版 legacy 源运行时。
 
 首次推送后，GitHub Actions 完成检查和构建才会发布 `.aix`；如安装时提示文件不存在，请先查看 [构建状态](https://github.com/940440952/venera-sources/actions)。
 

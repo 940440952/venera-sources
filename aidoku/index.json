@@ -5,14 +5,14 @@
     {
       "id": "zh.manhuazhan",
       "name": "漫画站",
-      "version": 1,
+      "version": 2,
       "languages": [
         "zh"
       ],
       "contentRating": 1,
       "baseURL": "https://m.manhuazhan.com",
       "minAppVersion": "0.7.0",
-      "downloadURL": "https://github.com/940440952/venera-sources/releases/download/aidoku-zh.manhuazhan-v1/zh.manhuazhan-v1.aix"
+      "downloadURL": "https://github.com/940440952/venera-sources/releases/download/aidoku-zh.manhuazhan-v2/zh.manhuazhan-v2.aix"
     }
   ]
 }
