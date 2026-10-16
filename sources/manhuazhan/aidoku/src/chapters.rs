@@ -62,27 +62,10 @@ fn chinese_number(number: &str) -> Option<u32> {
     total.checked_add(section)?.checked_add(digits)
 }
 
-/// The site ID is only an ordering hint, never a displayed chapter number.
-pub fn order_hint(chapter_number: Option<f32>, key: &str) -> Option<f32> {
-    chapter_number.or_else(|| {
-        let (_, value) = key.rsplit_once('-')?;
-        if value.is_empty() || !value.bytes().all(|byte| byte.is_ascii_digit()) {
-            return None;
-        }
-        value.parse::<f32>().ok().filter(|value| value.is_finite())
-    })
-}
-
-/// Aidoku expects newest -> oldest, regardless of the website's directory order.
-pub fn ensure_newest_first<T>(chapters: &mut [T], hint: impl Fn(&T) -> Option<f32>) {
-    if chapters
-        .first()
-        .and_then(&hint)
-        .zip(chapters.last().and_then(&hint))
-        .is_some_and(|(first, last)| first < last)
-    {
-        chapters.reverse();
-    }
+/// Manhuazhan's DOM is oldest -> newest; Aidoku needs newest -> oldest.
+/// Reverse exactly once, preserving the site's order of parts and specials.
+pub fn reverse_dom_order<T>(chapters: &mut [T]) {
+    chapters.reverse();
 }
 
 #[cfg(test)]
@@ -141,57 +124,77 @@ mod tests {
     }
 
     #[test]
-    fn reverses_oldest_first_and_preserves_newest_first() {
+    fn reverses_dom_order_for_aidoku() {
         let mut chapters = ["第十五回", "第十六回", "第十七回"];
-        ensure_newest_first(&mut chapters, |title| chapter_number(title));
+        reverse_dom_order(&mut chapters);
         assert_eq!(
             chapters.map(chapter_number),
             [Some(17.0), Some(16.0), Some(15.0)]
         );
-        ensure_newest_first(&mut chapters, |title| chapter_number(title));
         assert_eq!(chapters, ["第十七回", "第十六回", "第十五回"]);
     }
 
     #[test]
-    fn falls_back_to_keys_without_changing_displayed_numbers() {
-        let mut chapters = [
-            (None, "12345-100"),
-            (None, "12345-101"),
-            (None, "12345-102"),
+    fn preserves_parts_and_reader_next_chapter_direction() {
+        let dom = [
+            "第十五回 上",
+            "第十五回 中",
+            "第十五回 下",
+            "第十六回 上",
+            "第十六回 下",
+            "第十七回 上",
         ];
-        ensure_newest_first(&mut chapters, |(number, key)| order_hint(*number, key));
+        let mut chapters = dom.map(|title| (title, chapter_number(title)));
+        reverse_dom_order(&mut chapters);
         assert_eq!(
-            chapters,
+            chapters.map(|chapter| chapter.0),
             [
-                (None, "12345-102"),
-                (None, "12345-101"),
-                (None, "12345-100")
+                "第十七回 上",
+                "第十六回 下",
+                "第十六回 上",
+                "第十五回 下",
+                "第十五回 中",
+                "第十五回 上",
             ]
         );
-        ensure_newest_first(&mut chapters, |(number, key)| order_hint(*number, key));
-        assert_eq!(chapters[0], (None, "12345-102"));
-        assert_eq!(order_hint(Some(16.0), "12345-100"), Some(16.0));
-        assert_eq!(order_hint(None, "prefix-12345-100"), Some(100.0));
-        for key in ["12345", "12345-", "12345-unknown", "12345-NaN", "12345-inf"] {
-            assert_eq!(order_hint(None, key), None);
-        }
+        // Aidoku's reader moves to index - 1 in the original chapter list.
+        let current = chapters
+            .iter()
+            .position(|chapter| chapter.0 == "第十六回 上")
+            .unwrap();
+        assert_eq!(chapters[current - 1], ("第十六回 下", Some(16.0)));
+        assert_eq!(chapters[current - 2], ("第十七回 上", Some(17.0)));
+        assert_eq!(chapters[current], ("第十六回 上", Some(16.0)));
     }
 
     #[test]
-    fn preserves_empty_single_equal_and_unknown_orders() {
+    fn reverses_unnumbered_endpoints_and_preserves_metadata() {
+        let dom = ["序章", "第一回", "第二回", "第三回", "番外篇"];
+        let mut chapters = dom.map(|title| (title, chapter_number(title)));
+        assert_eq!(chapters.first().unwrap().1, None);
+        assert_eq!(chapters.last().unwrap().1, None);
+        reverse_dom_order(&mut chapters);
+        assert_eq!(
+            chapters,
+            [
+                ("番外篇", None),
+                ("第三回", Some(3.0)),
+                ("第二回", Some(2.0)),
+                ("第一回", Some(1.0)),
+                ("序章", None),
+            ]
+        );
+    }
+
+    #[test]
+    fn handles_empty_single_and_entirely_unnumbered_chapters() {
         let mut empty: [Option<f32>; 0] = [];
-        ensure_newest_first(&mut empty, |number| *number);
+        reverse_dom_order(&mut empty);
         let mut single = [Some(16.0)];
-        ensure_newest_first(&mut single, |number| *number);
+        reverse_dom_order(&mut single);
         assert_eq!(single, [Some(16.0)]);
-        for original in [
-            [Some(16.0), Some(16.0)],
-            [None, Some(16.0)],
-            [Some(16.0), None],
-        ] {
-            let mut chapters = original;
-            ensure_newest_first(&mut chapters, |number| *number);
-            assert_eq!(chapters, original);
-        }
+        let mut chapters = ["序章", "特别篇", "番外篇"];
+        reverse_dom_order(&mut chapters);
+        assert_eq!(chapters, ["番外篇", "特别篇", "序章"]);
     }
 }

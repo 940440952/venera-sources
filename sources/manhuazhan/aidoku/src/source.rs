@@ -1,5 +1,5 @@
 use crate::{
-    chapters::{chapter_number, ensure_newest_first, order_hint},
+    chapters::{chapter_number, reverse_dom_order},
     parser::{self, BASE_URL},
 };
 use aidoku::{
@@ -222,9 +222,7 @@ impl Source for Manhuazhan {
             if chapters.is_empty() {
                 bail!("章节目录为空，站点格式可能已变化。");
             }
-            ensure_newest_first(&mut chapters, |chapter| {
-                order_hint(chapter.chapter_number, &chapter.key)
-            });
+            reverse_dom_order(&mut chapters);
             manga.chapters = Some(chapters);
         }
         Ok(manga)
