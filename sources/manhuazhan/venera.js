@@ -3,7 +3,7 @@ class Manhuazhan extends ComicSource {
     key = "manhuazhan";
     version = "1.0.0";
     minAppVersion = "1.6.0";
-    url = "https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/sources/manhuazhan/venera.js";
+    url = "https://cdn.jsdelivr.net/gh/940440952/comic-sources@main/sources/manhuazhan/venera.js";
     baseUrl = "https://m.manhuazhan.com";
     keys = ["4-bXd9iN", "4-RXyjry", "4-oYvwVy", "4-4ZY57U", "4-mbJpU7", "4-6MM2Ei", "4-54TiQr", "4-Ph5xx9", "4-bYgePR", "4-Z9A3bW"];
 

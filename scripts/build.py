@@ -8,7 +8,7 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = "940440952/venera-sources"
+REPOSITORY = "940440952/comic-sources"
 CDN = f"https://cdn.jsdelivr.net/gh/{REPOSITORY}@main"
 
 
@@ -50,14 +50,17 @@ def run():
         if not source_dir.is_dir():
             continue
         javascript = source_dir / "venera.js"
-        if not javascript.is_file():
-            raise RuntimeError(f"Missing Venera implementation: {source_dir.name}")
-        source_code = javascript.read_text(encoding="utf-8")
-        name = re.search(r'\bname\s*=\s*"([^"]+)"', source_code).group(1)
-        version = re.search(r'\bversion\s*=\s*"([^"]+)"', source_code).group(1)
-        relative_script = javascript.relative_to(ROOT).as_posix()
-        venera_entries.append({"name": name, "version": version, "url": f"{CDN}/{relative_script}", "description": f"{source_dir.name}；关键词搜索可能需要网页验证，支持漫画数字 ID。"})
+        if javascript.is_file():
+            source_code = javascript.read_text(encoding="utf-8")
+            name = re.search(r'\bname\s*=\s*"([^"]+)"', source_code).group(1)
+            version = re.search(r'\bversion\s*=\s*"([^"]+)"', source_code).group(1)
+            relative_script = javascript.relative_to(ROOT).as_posix()
+            venera_entries.append({"name": name, "version": version, "url": f"{CDN}/{relative_script}", "description": f"{source_dir.name}；关键词搜索可能需要网页验证，支持漫画数字 ID。"})
         crate = source_dir / "aidoku"
+        if not crate.is_dir():
+            if not javascript.is_file():
+                raise RuntimeError(f"Missing reader implementation: {source_dir.name}")
+            continue
         manifest = json.loads((crate / "res/source.json").read_text(encoding="utf-8"))
         info = manifest["info"]
         filename = f"{info['id']}-v{info['version']}.aix"
@@ -87,7 +90,7 @@ def run():
                     raise RuntimeError(f"Invalid package: {output}")
             print(output)
     write_json(ROOT / "index.json", venera_entries)
-    write_json(ROOT / "aidoku/index.json", {"name": "漫画站双生态源库", "feedbackURL": f"https://github.com/{REPOSITORY}/issues", "sources": aidoku_entries})
+    write_json(ROOT / "aidoku/index.json", {"name": "漫画阅读器源库", "feedbackURL": f"https://github.com/{REPOSITORY}/issues", "sources": aidoku_entries})
 
 
 if __name__ == "__main__":

@@ -1,7 +1,19 @@
 {
-  "name": "漫画站双生态源库",
-  "feedbackURL": "https://github.com/940440952/venera-sources/issues",
+  "name": "漫画阅读器源库",
+  "feedbackURL": "https://github.com/940440952/comic-sources/issues",
   "sources": [
+    {
+      "id": "zh.hipmh",
+      "name": "嗨皮漫画",
+      "version": 1,
+      "languages": [
+        "zh"
+      ],
+      "contentRating": 1,
+      "baseURL": "https://m.hipmh.com",
+      "minAppVersion": "0.7.0",
+      "downloadURL": "https://github.com/940440952/comic-sources/releases/download/aidoku-zh.hipmh-v1/zh.hipmh-v1.aix"
+    },
     {
       "id": "zh.manhuazhan",
       "name": "漫画站",
@@ -12,7 +24,7 @@
       "contentRating": 1,
       "baseURL": "https://m.manhuazhan.com",
       "minAppVersion": "0.7.0",
-      "downloadURL": "https://github.com/940440952/venera-sources/releases/download/aidoku-zh.manhuazhan-v3/zh.manhuazhan-v3.aix"
+      "downloadURL": "https://github.com/940440952/comic-sources/releases/download/aidoku-zh.manhuazhan-v3/zh.manhuazhan-v3.aix"
     }
   ]
 }

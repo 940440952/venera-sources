@@ -13,8 +13,14 @@ test('catalogs refer to the implemented source with synchronized independent ver
     assert.equal(venera.length, 1);
     assert.equal(venera[0].version, code.match(/\bversion\s*=\s*"([^"]+)"/)[1]);
     assert.equal(venera[0].url, code.match(/\burl\s*=\s*"([^"]+)"/)[1]);
-    assert.equal(aidoku.sources[0].id, metadata.id);
-    assert.equal(aidoku.sources[0].version, metadata.version);
-    assert.equal(aidoku.sources[0].minAppVersion, metadata.minAppVersion);
-    assert.ok(aidoku.sources[0].downloadURL.endsWith(`/aidoku-${metadata.id}-v${metadata.version}/${metadata.id}-v${metadata.version}.aix`));
+    assert.deepEqual(aidoku.sources.map(source => source.id).sort(), ['zh.hipmh', 'zh.manhuazhan']);
+    for (const entry of aidoku.sources) {
+        const sourceName = entry.id.split('.')[1];
+        const info = JSON.parse(fs.readFileSync(path.join(root, `sources/${sourceName}/aidoku/res/source.json`), 'utf8')).info;
+        assert.equal(entry.version, info.version);
+        assert.equal(entry.minAppVersion, info.minAppVersion);
+        assert.equal(entry.downloadURL, `https://github.com/940440952/comic-sources/releases/download/aidoku-${info.id}-v${info.version}/${info.id}-v${info.version}.aix`);
+    }
+    assert.equal(aidoku.sources.find(source => source.id === metadata.id).version, metadata.version);
+    assert.equal(venera[0].url, 'https://cdn.jsdelivr.net/gh/940440952/comic-sources@main/sources/manhuazhan/venera.js');
 });

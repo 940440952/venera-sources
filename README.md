@@ -1,30 +1,30 @@
 # 双生态漫画源仓库
 
-同一个漫画网站同时维护两套原生扩展：**Venera / VeneraNext / VeneraPlus 的 JavaScript 源**，以及 **Aidoku 的 Rust / WASM 源**。当前站点为 [漫画站 manhuazhan.com](https://m.manhuazhan.com)。仓库名称保留 `venera-sources`，以保持已约定的订阅地址稳定。
+同一个漫画网站同时维护两套原生扩展：**Venera / VeneraNext / VeneraPlus 的 JavaScript 源**，以及 **Aidoku 的 Rust / WASM 源**。当前支持 [漫画站 manhuazhan.com](https://m.manhuazhan.com)（双生态）和 [嗨皮漫画 Hipmh](https://m.hipmh.com)（仅 Aidoku）。仓库名为 `comic-sources`，请使用下方新订阅地址。
 
 ## Venera 系列订阅与安装
 
 在 Venera、VeneraNext 或 VeneraPlus 的「漫画源 / 源仓库」设置中添加此订阅地址，再安装「漫画站」（不同版本的菜单名称可能略有不同）：
 
 ```text
-https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/index.json
+https://cdn.jsdelivr.net/gh/940440952/comic-sources@main/index.json
 ```
 
-也可下载 [venera.js](https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/sources/manhuazhan/venera.js)，使用应用的本地文件导入功能安装。源要求兼容 Venera 1.6.0 及以上的源 API。
+也可下载 [venera.js](https://cdn.jsdelivr.net/gh/940440952/comic-sources@main/sources/manhuazhan/venera.js)，使用应用的本地文件导入功能安装。源要求兼容 Venera 1.6.0 及以上的源 API。
 
 ## Aidoku 订阅与安装
 
-在支持新版源 API 的 **Aidoku 0.7.0 及以上**版本中，进入「设置 → 源列表」，添加以下 JSON 地址，再前往浏览页的添加源页面安装「漫画站」；如未显示，请确认已启用中文语言筛选。
+在支持新版源 API 的 **Aidoku 0.7.0 及以上**版本中，进入「设置 → 源列表」，添加以下 JSON 地址，再前往浏览页的添加源页面安装「漫画站」或「嗨皮漫画」；如未显示，请确认已启用中文语言筛选。
 
 ```text
-https://cdn.jsdelivr.net/gh/940440952/venera-sources@main/aidoku/index.json
+https://cdn.jsdelivr.net/gh/940440952/comic-sources@main/aidoku/index.json
 ```
 
-也可从 [Releases](https://github.com/940440952/venera-sources/releases) 下载 `zh.manhuazhan-v3.aix`，通过系统分享菜单用 Aidoku 打开，或在 Aidoku 添加源界面选择本地 `.aix` 文件。Rust 源码不能直接导入 Aidoku，须使用构建后的 `.aix` 包。此实现使用新版 Aidoku API，不适用于旧版 legacy 源运行时。
+也可从 [Releases](https://github.com/940440952/comic-sources/releases) 下载 `zh.manhuazhan-v3.aix` 或 `zh.hipmh-v1.aix`，通过系统分享菜单用 Aidoku 打开，或在 Aidoku 添加源界面选择本地 `.aix` 文件。Rust 源码不能直接导入 Aidoku，须使用构建后的 `.aix` 包。此实现使用新版 Aidoku API，不适用于旧版 legacy 源运行时。
 
 Aidoku 源 v3 将漫画站默认的「旧 → 新」DOM 章节列表整体反转一次后返回，保留上、中、下和特殊章节的相对次序，不再用章节编号或 key 推断方向。阅读器按原始列表切换章节，目录界面的排序设置不能用于验证阅读方向。更新已安装的源后，请退出阅读器，在漫画详情页刷新章节，再重新进入阅读。
 
-首次推送后，GitHub Actions 完成检查和构建才会发布 `.aix`；如安装时提示文件不存在，请先查看 [构建状态](https://github.com/940440952/venera-sources/actions)。
+首次推送后，GitHub Actions 完成检查和构建才会发布 `.aix`；如安装时提示文件不存在，请先查看 [构建状态](https://github.com/940440952/comic-sources/actions)。
 
 ## 当前支持与验证
 
@@ -48,6 +48,7 @@ Aidoku 源 v3 将漫画站默认的「旧 → 新」DOM 章节列表整体反转
 index.json                          Venera 系列订阅目录
 aidoku/index.json                   Aidoku 订阅目录
 sources/
+  hipmh/aidoku/                    Hipmh Rust 源、元数据与上游说明
   manhuazhan/
     venera.js                      JS 实现
     aidoku/
@@ -60,7 +61,7 @@ scripts/smoke.cjs                  手动执行的真实站点检查
 .github/workflows/check.yml        回归检查、WASM 构建及版本发布
 ```
 
-按网站划分目录，而非按阅读器拆开站点；未来新增网站时，在 `sources/<站点>/` 下加入 `venera.js` 和完整的 `aidoku/` 项目。构建脚本扫描所有站点并生成各生态目录，文件名与 Rust 包名使用同一站点标识。
+按网站划分目录，而非按阅读器拆开站点；未来新增网站时，在 `sources/<站点>/` 下按需加入 `venera.js`、完整的 `aidoku/` 项目，或两者。构建脚本扫描所有站点并生成各生态目录，文件名与 Rust 包名使用同一站点标识。
 
 ## 开发与发布
 
@@ -69,7 +70,10 @@ scripts/smoke.cjs                  手动执行的真实站点检查
 ```sh
 npm ci --ignore-scripts
 npm test
-cargo test --locked --manifest-path sources/manhuazhan/aidoku/Cargo.toml
+for source in sources/*/aidoku/Cargo.toml; do
+  cargo fmt --manifest-path "$source" -- --check
+  cargo test --locked --manifest-path "$source"
+done
 python3 scripts/build.py
 ```
 
@@ -77,8 +81,16 @@ python3 scripts/build.py
 
 `npm run smoke` 访问真实站点并下载一张图片，可能受站点限流或网络影响；日常 CI 使用固定回归样例，避免把站点暂时不可达当作代码失败。
 
-两套源独立版本：修改 JS 时递增 `venera.js` 的版本号；修改 Rust 时递增 `res/source.json` 的整数版本号。重新生成并提交两套目录。推送 `main` 后 CI 先检查 JS、Rust 测试、格式和 WASM 构建，再将 `.aix` 上传为构建产物，并按 `aidoku-zh.manhuazhan-v<版本>` 创建 Release。已存在的版本不会覆盖，修复须升版。
+两套源独立版本：修改 JS 时递增 `venera.js` 的版本号；修改 Rust 时递增 `res/source.json` 的整数版本号。重新生成并提交两套目录。推送 `main` 后 CI 先检查 JS、Rust 测试、格式和 WASM 构建，再将 `.aix` 上传为构建产物，并按 `aidoku-<源 ID>-v<版本>` 创建 Release。已存在的版本不会覆盖，修复须升版。
 
 jsDelivr 有缓存，更新源后可能需要等待。反馈请提交 Issues，注明阅读器名称、版本、漫画 ID、章节及报错信息。
 
 接口依据：[Venera 源 API](https://github.com/venera-app/venera/blob/master/doc/comic_source.md)、[Aidoku Rust API](https://github.com/Aidoku/aidoku-rs)、[Aidoku 源目录读取实现](https://github.com/Aidoku/Aidoku/blob/main/Aidoku/Core/Sources/SourceList/ExternalSourceInfo.swift)。
+
+## Hipmh Aidoku
+
+`zh.hipmh` v1 使用当前 Hipmh API，支持搜索、最近更新、热门漫画、详情、多页章节、阅读页配置、图片 payload 解码、诱饵图删除和图片 Referer。章节请求显式使用 `order=desc`，直接保持新 → 旧顺序，不额外反转。支持 `/works/...` 和 reader 章节链接。
+
+实现依据为 [Onedaytalk/tachimanga-hipmh-extension](https://github.com/Onedaytalk/tachimanga-hipmh-extension/tree/031bf1ab665a489593fc77d270e4c6f56bfd07f5)，已改写为 Aidoku Rust 接口；来源及许可见 `sources/hipmh/aidoku/res/NOTICE.txt` 和 `LICENSE.txt`。固定测试使用真实章节 payload，并覆盖格式损坏、URL 和诱饵处理。
+
+此前聊天生成的 ZIP 未迁移到此工作环境，本实现从上述上游源码重新移植。手机 Aidoku 实机体验仍需在设备上验证。
